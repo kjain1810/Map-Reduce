@@ -34,49 +34,32 @@ public class SubstringFinder {
       String t = vals[1];
       int startS = Integer.parseInt(vals[2]);
       int startT = Integer.parseInt(vals[3]);
-      
-      int M = t.length();
-      int N = s.length();
-
-      int[] F = new int[M + 1];
-      F[0] = F[1] = 0;
-      for(int i = 2; i <= M; i++) {
-        System.out.println("Preprocessing -- " + i);
-        int j = F[i - 1];
-        while(true) {
-          if(t.charAt(j) == t.charAt(i - 1)) {
-            F[i] = j + 1;
-            break;
-          }
-          if(j == 0) {
-            F[i] = 0;
-            break;
-          }
-          j = F[j];
+    
+      // KMP
+      int n = t.length();
+      int m = s.length();
+      String S = t + "$" + s;
+      int[] pi = new int[n + m + 1];
+      pi[0] = 0;
+      int N = S.length();
+      for(int i = 1; i < N; i++) {
+        pi[i] = 0;
+        int j = pi[i - 1];
+        while(j > 0 && S.charAt(j) != S.charAt(i)) {
+          j = pi[j - 1];
+        }
+        if(S.charAt(j) == S.charAt(i)) {
+          pi[i] = j + 1;
         }
       }
-
-      int i = 0;
-      int j = 0;
-      while(true) {
-        if(j == N) break;
-
-        if(s.charAt(j) == t.charAt(i)) {
-          i++;
-          j++;
-          if(i == M) {
-            k.set(startS + i - startT);
-            v.set(startT);
-            context.write(k, v);
-            i = 0;
-          }         
-        } else if(i > 0) {
-          i = F[i];
-        } else {
-          j++;
+      for(int i = n + 1; i <= n + m; i++) {
+        if(pi[i] == n) {
+          int startIdx = i - 2 * n;
+          k.set(startS + startIdx - startT);
+          v.set(startT);
+          context.write(k, v);
+          System.out.println("Mapper -- k: " + k.get() + " v: " + v.get());
         }
-
-        System.out.println("KMP -- " + i + " " + j);
       }
 
       // do KMP in future, doing n^2 right now
