@@ -1,3 +1,6 @@
+
+hadoop fs -copyFromLocal small_input.txt /dsproject
+
 module load hdfs
 export HADOOP_CLASSPATH=$(hadoop classpath)
 cd /data0/kunal2/newfolder
