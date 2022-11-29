@@ -15,7 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 public class SubstringFinder {
-  private final static int segmentsOfT = 2;
+  private static int segmentsOfT = 2;
   
   public static class SubstringMapper extends Mapper <Object, Text, IntWritable, IntWritable> { 
     private IntWritable k = new IntWritable();
@@ -116,10 +116,16 @@ public class SubstringFinder {
     job.setReducerClass(SubstringReducer.class);
     job.setOutputKeyClass(IntWritable.class);
     job.setOutputValueClass(IntWritable.class);
-
+    // job.setNumRedTasks(50);
+    // job.setNumMapTask(50);
+    
     List<String> otherArgs = new ArrayList<String>();
     for(int i = 0; i < remainingArgs.length; i++) {
-      otherArgs.add(remainingArgs[i]);
+      if("-numSegments".equals(remainingArgs[i])) {
+        segmentsOfT = Integer.parseInt(remainingArgs[++i]);
+      } else {
+        otherArgs.add(remainingArgs[i]);
+      }
     }
 
     FileInputFormat.addInputPath(job, new Path(otherArgs.get(0)));
